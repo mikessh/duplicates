@@ -61,13 +61,16 @@ def umiToInfo = new HashMap<String, List<IlmnInfo>>()
 
 // read in data
 
+int nReads = 0
+Double umiSz = null
+
 inputFileNames.eachWithIndex { fileName, ind ->
     println "[${new Date()}] Reading in data from $fileName"
 
     def reader = new BufferedReader(new InputStreamReader(fileName.endsWith(".gz") ?
             new GZIPInputStream(new FileInputStream(fileName)) :
             new FileInputStream(fileName)))
-    int nReads = 0
+    
     def header
     while ((header = reader.readLine()) != null) {
         reader.readLine()
@@ -82,16 +85,24 @@ inputFileNames.eachWithIndex { fileName, ind ->
         def (tile, x, y) = coordEntry.split(":")[-3..-1].collect { it.toInteger() }
 
         // parse UMI data from header
+		if (splitHeader.length < 3) {
+			println "Apparently no UMI header in sample.. skipping"
+			break
+		}
 
         def umiEntry = splitHeader[2]
         String umi = umiEntry.split(":")[1] // quality can contain :
-        if (!sameBarcodeSpaceFlag)
-            umi += ind // to distinguish different samples
         int qSum = 0
         for (int i = umiEntry.length() - umi.length(); i < umiEntry.length(); i++)
             qSum += (int) umiEntry.charAt(i)
 
         qSum -= 33 * umi.length()
+        
+        if (!umiSz)
+            umiSz = (double)umi.length()
+
+        if (!sameBarcodeSpaceFlag)
+            umi += ind // to distinguish different samples
 
         def infoList = umiToInfo[umi]
         if (infoList == null)
@@ -103,8 +114,6 @@ inputFileNames.eachWithIndex { fileName, ind ->
             println "[${new Date()}] ${nReads} processed, ${umiToInfo.size()} total UMIs"
     }
 }
-
-def umiSz = (double) umiToInfo.keySet().iterator().next().length()
 
 // Copy to array for random access
 
