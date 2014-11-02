@@ -32,6 +32,6 @@ ggplot()+
   scale_y_continuous("") +
   scale_x_log10("Cluster distance, pixels") +
   facet_grid(facet~.,scales="free_y", shrink = FALSE) +
-  guides(fill = guide_legend("Read set", order = 1), color = guide_legend("", order = 2))
+  guides(fill = guide_legend("Read set", order = 1), color = guide_legend("", order = 2)) + theme_bw()
 
 dev.off()

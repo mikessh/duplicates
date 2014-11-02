@@ -11,5 +11,5 @@ ggplot() + geom_density(data = df, aes(dist), alpha=.3, adjust = 5) +
 scale_y_continuous("Density") + 
 scale_x_log10("Cluster distance, pixels") +
 geom_vline(xintercept=c(100), linetype="dotted") +
-facet_grid(umi ~ sample + cdr3)
+facet_grid(umi ~ sample + cdr3) + theme_bw()
 dev.off()
